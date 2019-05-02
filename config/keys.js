@@ -1,4 +1,4 @@
 module.exports = {
     mongoURI: 'mongodb://localhost/devConnect',
-    secretOrkey: 'My secret'
+    secretOrkeys: 'My secret'
 }
