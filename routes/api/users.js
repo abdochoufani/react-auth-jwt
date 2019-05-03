@@ -6,6 +6,9 @@ const keys = require('../../config/keys');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
+//load input validation
+const validateRegisterInput = require('../../validation/register');
+
 //@Route GET  api/users/test
 //@description test users request
 //@access Public
@@ -17,6 +20,10 @@ router.get('/test', (req, res) => {
 //@description register users request
 //@access Public
 router.post('/register', (req, res) => {
+	const { errors, isValid } = validateRegisterInput(req.body);
+	if (!isValid) {
+		return res.status(400).json(errors);
+	}
 	User.findOne({ email: req.body.email }).then((user) => {
 		if (user) {
 			return res.status(400).json({ email: 'email already exists' });
@@ -91,11 +98,11 @@ router.post('/login', (req, res) => {
 					}
 				})
 				.catch((err) => {
-					res.json({ msg: 'error 101' });
+					res.status(400).json({ msg: 'error comparing password' });
 				});
 		})
 		.catch((err) => {
-			res.json({ msg: 'error 102' });
+			res.status(404).json({ msg: 'error 102' });
 		});
 });
 
@@ -103,7 +110,12 @@ router.post('/login', (req, res) => {
 //@description return current user
 //@access Private
 router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
-	res.json(req.user);
+	res.json({
+		id: req.user.id,
+		name: req.user.name,
+		email: req.user.email,
+		avatar: req.user.avatar
+	});
 });
 
 module.exports = router;
