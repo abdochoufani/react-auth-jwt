@@ -21,9 +21,11 @@ router.get('/test', (req, res) => {
 //@access Public
 router.post('/register', (req, res) => {
 	const { errors, isValid } = validateRegisterInput(req.body);
+	//check validation
 	if (!isValid) {
 		return res.status(400).json(errors);
 	}
+
 	User.findOne({ email: req.body.email }).then((user) => {
 		if (user) {
 			return res.status(400).json({ email: 'email already exists' });
@@ -37,7 +39,7 @@ router.post('/register', (req, res) => {
 				name: req.body.name,
 				email: req.body.email,
 				avatar,
-				password: req.body.password
+				password: req.body.password,
 			});
 
 			bcrypt.genSalt(10, (err, salt) => {
@@ -47,10 +49,10 @@ router.post('/register', (req, res) => {
 					newUser
 						.save()
 						.then((user) => {
-							res.json(user);
+							return res.json(user);
 						})
 						.catch((err) => {
-							console.log(err);
+							return res.status(400).json({ error: 'Something went wrong' });
 						});
 				});
 			});
